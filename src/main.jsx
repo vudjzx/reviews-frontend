@@ -6,7 +6,7 @@ import App from "./App";
 import "./index.css";
 
 const client = new ApolloClient({
-  uri: "http://localhost:3100",
+  uri: `${import.meta.env.VITE_BACKEND_URL}`,
   cache: new InMemoryCache(),
 });
 
