@@ -28,7 +28,7 @@ function Reviews() {
 
   return (
     <div className="pt-24 px-4">
-      <h1>Reviews</h1>
+      <h1>Current reviews</h1>
       {data &&
         data.reviews.map((review, index) => {
           const date = new Date(parseInt(review.createdAt));

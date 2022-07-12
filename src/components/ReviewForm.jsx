@@ -71,7 +71,6 @@ export default function ReviewForm({
       return;
     }
     const author = formData.author !== "" ? formData.author : "Anonymous";
-    console.log(formData);
     const dataReview = await createReview({
       variables: {
         author: author,
