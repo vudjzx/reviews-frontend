@@ -76,7 +76,7 @@ function TvShows() {
           <h1 className="text-white text-4xl">No Tv Shows found</h1>
         </div>
       )}
-      <div className="w-full h-[90%] grid grid-cols-1 lg:grid-cols-4 sm:grid-cols-2 gap-4 font-light ">
+      <div className="w-full h-[90%] grid grid-cols-1 xl:grid-cols-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 font-light ">
         {movies.map((movie, index) => (
           <TrendingItem
             title={movie.name}
