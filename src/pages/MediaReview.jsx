@@ -102,9 +102,9 @@ function MediaReview() {
   function MoviePoster({ className }) {
     return (
       <img
-        className="rounded-2xl overflow-hidden col-span-2 lg:col-span-1 w-full h-full"
+        className="rounded-2xl overflow-hidden col-span-2 lg:col-span-1 w-full h-full relative"
         src={
-          media.poster_path ? `${img_300}/${media.poster_path}` : unavailable
+          media.poster_path ? `${img_500}/${media.poster_path}` : unavailable
         }
         alt={media.name || media.title}
       />
@@ -140,9 +140,11 @@ function MediaReview() {
   }
   return (
     <div className="h-screen w-full pt-24 px-4">
-      <div className="hidden sm:grid sm:grid-cols-4 gap-4">
-        <MoviePoster />
-        <MovieInfo />
+      <div className="hidden sm:flex">
+        <div className="w-72 h-96">
+          <MoviePoster />
+        </div>
+        <MovieInfo className="w-full pl-3" />
       </div>
       <LandscapePoster />
       <MovieInfo className="sm:hidden" />
