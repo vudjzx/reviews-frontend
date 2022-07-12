@@ -1,6 +1,13 @@
 import React from "react";
 export default function PaginationComponent(props) {
   const { page, changePage, pages, totalPages } = props;
+  let numOfPages = [];
+  if (totalPages <= 5) {
+    numOfPages = Array(totalPages)
+      .fill(0)
+      .map((_, i) => i + 1);
+  }
+  const pagesMap = totalPages >= 5 ? pages : numOfPages;
   if (totalPages === 0) return null;
   return (
     <div className="flex items-center justify-center w-full">
@@ -16,7 +23,7 @@ export default function PaginationComponent(props) {
             <span className="flex justify-center items-center">...</span>
           </>
         )}
-        {pages.map((e, index) => {
+        {pagesMap.map((e, index) => {
           const isActive = e === page;
           return (
             <button
