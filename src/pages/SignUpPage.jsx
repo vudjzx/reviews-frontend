@@ -68,6 +68,7 @@ function SignUpPage() {
         variables: { userInput: { ...formData } },
       });
     } catch (error) {
+      console.log(error);
       setAlert({
         message: error.message,
         error: true,
