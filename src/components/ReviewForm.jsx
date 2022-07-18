@@ -1,33 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import CustomListBox from "./CustomListBox";
 import { gql, useMutation } from "@apollo/client";
 import LoadingComponent from "./LoadingComponent";
 import CustomAlert from "./CustomAlert";
 import { GET_REVIEWS } from "../pages/Reviews";
+import { AuthContext } from "../context/AuthProvider";
+import { GET_MEDIA_REVIEWS } from "../pages/MediaReview";
+import { GET_PUBLIC_REVIEWS } from "../pages/Profile";
 
 const CREATE_REVIEW = gql`
-  mutation CreateReview(
-    $author: String!
-    $content: String!
-    $score: String!
-    $mediaId: String!
-    $mediaType: String!
-    $mediaUrl: String!
-    $coverUrl: String!
-    $mediaTitle: String!
-  ) {
-    createReview(
-      author: $author
-      content: $content
-      score: $score
-      mediaId: $mediaId
-      mediaType: $mediaType
-      mediaUrl: $mediaUrl
-      coverUrl: $coverUrl
-      mediaTitle: $mediaTitle
-    ) {
-      author
+  mutation CreateReview($reviewInput: ReviewInput!) {
+    createReview(reviewInput: $reviewInput) {
       content
+      mediaId
+      mediaTitle
+      author {
+        name
+        _id
+      }
     }
   }
 `;
@@ -39,10 +29,11 @@ export default function ReviewForm({
   coverUrl,
   mediaTitle,
 }) {
+  const { user } = useContext(AuthContext);
   const [formData, setFormData] = useState({
-    author: "",
+    author: user?._id,
     content: "",
-    score: "1",
+    score: "10",
     mediaId,
     mediaType,
     mediaUrl,
@@ -50,13 +41,23 @@ export default function ReviewForm({
     mediaTitle,
   });
   const [createReview, { data, loading, error }] = useMutation(CREATE_REVIEW, {
-    refetchQueries: [{ query: GET_REVIEWS }],
+    refetchQueries: [
+      { query: GET_REVIEWS, variables: { mediaId, mediaType } },
+      { query: GET_MEDIA_REVIEWS, variables: { mediaId } },
+      {
+        query: GET_PUBLIC_REVIEWS,
+        variables: {
+          userId: formData.author,
+          mediaType: formData.mediaType,
+        },
+      },
+    ],
   });
   const [alert, setAlert] = useState({
     message: "",
     error: false,
   });
-
+  const [pristineForm, setPristineForm] = useState(true);
   const setScore = (score) => {
     setFormData({ ...formData, score: score.name });
   };
@@ -70,17 +71,12 @@ export default function ReviewForm({
       });
       return;
     }
-    const author = formData.author !== "" ? formData.author : "Anonymous";
+
     const dataReview = await createReview({
       variables: {
-        author: author,
-        content: formData.content,
-        score: formData.score,
-        mediaId: formData.mediaId,
-        mediaType: formData.mediaType,
-        mediaUrl: formData.mediaUrl,
-        coverUrl: formData.coverUrl,
-        mediaTitle: formData.mediaTitle,
+        reviewInput: {
+          ...formData,
+        },
       },
     });
     if (dataReview.data.createReview) {
@@ -88,6 +84,8 @@ export default function ReviewForm({
         message: "Review submitted successfully",
         error: false,
       });
+      setPristineForm(false);
+      window.scrollTo(0, 0);
     }
     setFormData({
       ...formData,
@@ -110,49 +108,36 @@ export default function ReviewForm({
       {alert.message !== "" && (
         <CustomAlert message={alert.message} error={alert.error} />
       )}
-      <form className="pb-8 mb-4">
-        <div className="mb-4">
-          <label className="block text-lg font-bold mb-2" htmlFor="name">
-            {`Your name (optional)`}
-          </label>
-          <input
-            className="rounded-lg shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="name"
-            type="text"
-            placeholder="John Doe"
-            value={formData.author}
-            onChange={(e) =>
-              setFormData({ ...formData, author: e.target.value })
-            }
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-lg font-bold mb-2" htmlFor="review">
-            {`Your review *`}
-          </label>
-          <textarea
-            className="shadow appearance-none border rounded-lg w-full py-2 px-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-32 resize-none"
-            id="review"
-            type="text"
-            placeholder="This was a great movie..."
-            value={formData.content}
-            onChange={(e) =>
-              setFormData({ ...formData, content: e.target.value })
-            }
-          />
-        </div>
-        <p className="block text-lg font-bold mb-2">{`Score *`}</p>
-        <CustomListBox score={formData.score} setScore={setScore} />
-        <div className="w-full py-4">
-          <button
-            className="bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-2 px-4 rounded-lg transition-colors w-full"
-            type="submit"
-            onClick={handleSubmit}
-          >
-            Submit review
-          </button>
-        </div>
-      </form>
+      {pristineForm && (
+        <form className="pb-8 mb-4">
+          <div className="mb-4">
+            <label className="block text-lg font-bold mb-2" htmlFor="review">
+              {`Your review *`}
+            </label>
+            <textarea
+              className="shadow appearance-none border rounded-lg w-full py-2 px-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-32 resize-none"
+              id="review"
+              type="text"
+              placeholder="This was a great movie..."
+              value={formData.content}
+              onChange={(e) =>
+                setFormData({ ...formData, content: e.target.value })
+              }
+            />
+          </div>
+          <p className="block text-lg font-bold mb-2">{`Score *`}</p>
+          <CustomListBox score={formData.score} setScore={setScore} />
+          <div className="w-full py-4">
+            <button
+              className="bg-indigo-600 hover:bg-indigo-800 text-white font-bold py-2 px-4 rounded-lg transition-colors w-full"
+              type="submit"
+              onClick={handleSubmit}
+            >
+              Submit review
+            </button>
+          </div>
+        </form>
+      )}
     </div>
   );
 }

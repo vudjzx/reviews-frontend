@@ -1,4 +1,3 @@
-import axios from "axios";
 import React, { useEffect } from "react";
 import useMovies from "../hooks/useMovies";
 const Genres = ({
@@ -36,7 +35,7 @@ const Genres = ({
           <div
             onClick={() => handleRemove(genre)}
             key={genre.id}
-            className="cursor-pointer text-black bg-yellow-400 px-3 py-1 rounded-full mx-1 mb-2"
+            className="cursor-pointer text-slate-50 bg-indigo-500 px-3 py-1 rounded-full mx-1 mb-2"
           >
             <p>{genre.name}</p>
           </div>
@@ -46,7 +45,7 @@ const Genres = ({
           <div
             onClick={() => handleAdd(genre)}
             key={genre.id}
-            className="cursor-pointer bg-slate-500 px-3 py-1 rounded-full mx-1 mb-2 hover:bg-yellow-400 hover:text-black transition-colors"
+            className="cursor-pointer bg-slate-500 px-3 py-1 rounded-full mx-1 mb-2 hover:bg-indigo-500 transition-colors"
           >
             <p>{genre.name}</p>
           </div>

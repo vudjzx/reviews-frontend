@@ -1,17 +1,36 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import LoadingComponent from "../components/LoadingComponent";
 import useMovies from "../hooks/useMovies";
-import {
-  img_300,
-  img_500,
-  unavailable,
-  unavailableLandscape,
-} from "../config/config";
+import { img_300, img_500 } from "../config/config";
+import { gql, useQuery } from "@apollo/client";
 import ReviewForm from "../components/ReviewForm";
+import MovieInfo from "../components/media/MovieInfo";
+import LandscapePoster from "../components/media/LandscapePoster";
+import MoviePoster from "../components/media/MoviePoster";
+import BackButton from "../components/BackButton";
+
+export const GET_MEDIA_REVIEWS = gql`
+  query GetMediaReviews($mediaId: String!) {
+    mediaReviews(mediaId: $mediaId) {
+      content
+      author {
+        name
+        avatar
+        _id
+      }
+      createdAt
+      _id
+      score
+    }
+  }
+`;
 
 function MediaReview() {
   const { id, type } = useParams();
+  const { loading, error, data } = useQuery(GET_MEDIA_REVIEWS, {
+    variables: { mediaId: id },
+  });
   const { getMediaById, getTrailers } = useMovies();
   const [media, setMedia] = useState();
   const [trailer, setTrailer] = useState("");
@@ -39,98 +58,13 @@ function MediaReview() {
     getMediaTrailers();
   }, []);
 
-  function MovieInfo({ className }) {
-    return (
-      <div
-        className={`flex flex-col col-span-2 lg:col-span-3 justify-between ${
-          className ?? ""
-        }`}
-      >
-        <div>
-          <h2>{media.title || media.name}</h2>
-          <h3 className="py-2 font-normal">{media.overview}</h3>
-          <h3>
-            Genres:{" "}
-            <span className="font-normal">
-              {media.genres.map((genre) => genre.name).join(", ")}
-            </span>
-          </h3>
-          <h3>
-            First Air Date:{" "}
-            <span className="font-normal">
-              {media.first_air_date || media.release_date}
-            </span>
-          </h3>
-          <h3>
-            Languages:{" "}
-            <span className="font-normal">
-              {media.spoken_languages.map((lang) => lang.name).join(", ")}
-            </span>
-          </h3>
-          <h3 className="">
-            Vote average:{" "}
-            <span className="font-normal">{media.vote_average}/10</span>
-          </h3>
-          <h3 className="text-slate-400 py-2">
-            Produced by:{" "}
-            <span className="font-normal">
-              {media.production_companies.map((e) => e.name).join(", ")}
-            </span>
-          </h3>
-        </div>
-        <div className="w-full my-2">
-          {trailer !== "" && (
-            <button className="shadow-lg shadow-slate-900 py-2 px-3 mr-3 bg-yellow-600 rounded-lg font-bold hover:bg-yellow-500 transition-colors">
-              <a
-                target="blank"
-                href={`https://www.youtube.com/watch?v=${trailer}`}
-              >
-                View trailer
-              </a>
-            </button>
-          )}
-          <button className="shadow-lg shadow-slate-900 py-2 px-3 mr-3 bg-yellow-600 rounded-lg font-bold hover:bg-yellow-500 transition-colors">
-            <a href={`${media.homepage}`} target="_blank">
-              Official site
-            </a>
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  function MoviePoster({ className }) {
-    return (
-      <img
-        className="rounded-2xl overflow-hidden col-span-2 lg:col-span-1 w-full h-full relative"
-        src={
-          media.poster_path ? `${img_500}/${media.poster_path}` : unavailable
-        }
-        alt={media.name || media.title}
-      />
-    );
-  }
-
-  function LandscapePoster() {
-    return (
-      <img
-        className="w-full sm:hidden rounded-2xl overflow-hidden mb-4"
-        src={
-          media.backdrop_path
-            ? `${img_500}/${media.backdrop_path}`
-            : unavailableLandscape
-        }
-        alt={media.name || media.title}
-      />
-    );
-  }
-
   if (!media)
     return (
       <div className="w-full h-screen">
         <LoadingComponent />
       </div>
     );
+
   if (media.error) {
     return (
       <div className="h-screen w-full flex items-center justify-center">
@@ -138,16 +72,34 @@ function MediaReview() {
       </div>
     );
   }
+
   return (
     <div className="h-screen w-full pt-24 px-4">
+      <BackButton />
       <div className="hidden sm:flex">
         <div className="w-72 h-96">
-          <MoviePoster />
+          <MoviePoster media={media} />
         </div>
-        <MovieInfo className="w-full pl-3" />
+        <MovieInfo
+          className="w-full pl-3 max-h-96"
+          media={media}
+          trailer={trailer}
+        />
       </div>
-      <LandscapePoster />
-      <MovieInfo className="sm:hidden" />
+      <div className="sm:hidden pb-4">
+        <LandscapePoster media={media} className="sm:hidden" />
+      </div>
+      <MovieInfo className="sm:hidden" media={media} trailer={trailer} />
+      {loading ? (
+        <div className="py-16">
+          <LoadingComponent />
+        </div>
+      ) : (
+        <div className="mt-6">
+          <h2>Reviews</h2>
+          <ReviewsViewSelector data={data} />
+        </div>
+      )}
       <ReviewForm
         mediaId={id}
         mediaType={type}
@@ -155,6 +107,66 @@ function MediaReview() {
         coverUrl={`${img_500}/${media.backdrop_path}`}
         mediaTitle={media.title || media.name}
       />
+    </div>
+  );
+}
+
+function ReviewsViewSelector({ data }) {
+  if (data && data?.mediaReviews?.length > 0) {
+    return data?.mediaReviews?.map((review, index) => (
+      <CommentReview key={index} review={review} />
+    ));
+  }
+  return (
+    <div className="flex items-center justify-center py-16">
+      <h2>No reviews yet</h2>
+    </div>
+  );
+}
+
+function CommentReview({ review }) {
+  const date = new Date(parseInt(review.createdAt)).toDateString();
+
+  function AuthorAvatar() {
+    return (
+      <div className="w-12 h-12 rounded-full bg-gray-200">
+        <img
+          src={review.author?.avatar}
+          alt={review.author?.name}
+          className="w-full h-full rounded-full"
+        />
+      </div>
+    );
+  }
+
+  function ReviewInfo() {
+    return (
+      <Link
+        to={`/profile/${review.author?._id}`}
+        className="px-4 w-full h-full overflow-hidden cursor-pointer"
+      >
+        <div className="flex items-center justify-between">
+          <h3 className="text-xl font-bold">{review.author.name}</h3>
+          <div className="ml-2">
+            <span className="text-gray-300">{date}</span>
+          </div>
+        </div>
+        <p className="text-slate-500 w-full overflow-hidden">
+          {review.content}
+        </p>
+        <p>
+          Score: <span className="font-light">{review.score}/10</span>
+        </p>
+      </Link>
+    );
+  }
+
+  return (
+    <div className="flex flex-col rounded-xl py-2">
+      <div className="flex items-center sm:items-start w-full p-2 px-3 flex-col sm:flex-row">
+        <AuthorAvatar />
+        <ReviewInfo />
+      </div>
     </div>
   );
 }

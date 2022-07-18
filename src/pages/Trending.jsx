@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import LoadingComponent from "../components/LoadingComponent";
 import PaginationComponent from "../components/PaginationComponent";
 import useMovies from "../hooks/useMovies";
-import TrendingItem from "../components/TrendingItem";
+import TrendingItem from "../components/media/TrendingItem";
 
 function Trending() {
   const { getTrending } = useMovies();
@@ -55,9 +55,9 @@ function Trending() {
   }
 
   return (
-    <div className="pt-20">
-      <h2 className={`py-4 px-4 font-light`}>Trending...</h2>
-      <div className="w-full h-[90%] grid grid-cols-1 xl:grid-cols-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 font-light ">
+    <div className="pt-24">
+      <h2 className="px-4">Trending...</h2>
+      <div className="w-full h-[90%] grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 font-light ">
         {movies.map((movie, index) => (
           <TrendingItem
             title={movie.title || movie.name}

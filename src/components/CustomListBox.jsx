@@ -1,18 +1,18 @@
-import { Fragment, useState } from "react";
+import { Fragment } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, SelectorIcon } from "@heroicons/react/solid";
 
 const people = [
-  { name: "1" },
-  { name: "2" },
-  { name: "3" },
-  { name: "4" },
-  { name: "5" },
-  { name: "6" },
-  { name: "7" },
-  { name: "8" },
-  { name: "9" },
   { name: "10" },
+  { name: "9" },
+  { name: "8" },
+  { name: "7" },
+  { name: "6" },
+  { name: "5" },
+  { name: "4" },
+  { name: "3" },
+  { name: "2" },
+  { name: "1" },
 ];
 
 export default function CustomListBox({ score, setScore }) {

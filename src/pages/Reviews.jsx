@@ -1,36 +1,56 @@
-import React from "react";
+import { useState } from "react";
 import { gql, useQuery } from "@apollo/client";
 import LoadingComponent from "../components/LoadingComponent";
 import ReviewItem from "../components/ReviewItem";
+import { Tabs } from "./Profile";
+import ZeroReviewsComponent from "../components/ZeroReviewsComponent";
 
 export const GET_REVIEWS = gql`
-  query GetReviews {
-    reviews {
+  query GetReviews($mediaType: String!) {
+    reviews(mediaType: $mediaType) {
       content
-      author
+      author {
+        name
+      }
       mediaUrl
       createdAt
       mediaType
       score
       coverUrl
       mediaTitle
+      mediaId
     }
   }
 `;
 function Reviews() {
-  const { loading, error, data } = useQuery(GET_REVIEWS);
-  if (loading)
-    return (
-      <div className="w-full h-screen">
-        <LoadingComponent />
-      </div>
-    );
+  const [activeTab, setActiveTab] = useState(0);
+  const { loading, data } = useQuery(GET_REVIEWS, {
+    variables: {
+      mediaType: activeTab === 0 ? "movie" : "tv",
+    },
+  });
 
   return (
-    <div className="pt-24 px-4">
-      <h1>Current reviews</h1>
+    <div className="pt-24 px-2">
+      <h2 className="px-2 pb-4">Browse Reviews</h2>
+      <Tabs
+        tabs={["Movies", "Tv Shows"]}
+        activeTab={activeTab}
+        setTab={setActiveTab}
+        tabStyles="w-full"
+      />
+      {!loading && data && data.reviews.length === 0 ? (
+        <div className="text-center mt-20">
+          <ZeroReviewsComponent message={"No reviews yet"} />
+        </div>
+      ) : null}
+      {loading ? (
+        <div className="w-full h-full mt-44">
+          <LoadingComponent />
+        </div>
+      ) : null}
       {data &&
-        data.reviews.map((review, index) => {
+        data?.reviews?.map((review, index) => {
           const date = new Date(parseInt(review.createdAt));
 
           return (
@@ -44,6 +64,7 @@ function Reviews() {
               coverUrl={review.coverUrl}
               mediaType={review.mediaType}
               mediaTitle={review.mediaTitle}
+              mediaId={review.mediaId}
             />
           );
         })}

@@ -15,7 +15,7 @@ export default function PaginationComponent(props) {
         {page >= 5 && (
           <>
             <button
-              className="bg-slate-800 px-3 py-2 mx-1 rounded-full flex justify-center items-center hover:bg-yellow-500 hover:text-black transition-colors duration-200"
+              className="bg-slate-800 px-3 py-2 mx-1 rounded-full flex justify-center items-center hover:bg-indigo-500 hover:text-black transition-colors duration-200"
               onClick={() => changePage(1)}
             >
               1
@@ -29,9 +29,9 @@ export default function PaginationComponent(props) {
             <button
               className={`${
                 isActive
-                  ? "bg-yellow-500 border-slate-800 text-black"
+                  ? "bg-indigo-500 border-slate-800 text-white"
                   : "bg-slate-800"
-              } px-3 py-2 mx-1 rounded-full flex justify-center items-center hover:bg-yellow-500 hover:text-black transition-colors duration-200`}
+              } px-3 py-2 mx-1 rounded-full flex justify-center items-center hover:bg-indigo-500 hover:text-black transition-colors duration-200`}
               onClick={() => changePage(e)}
               key={index}
             >

@@ -1,5 +1,5 @@
 import React from "react";
-import { img_500, unavailable } from "../config/config";
+import { img_500, unavailable } from "../../config/config";
 import { Link } from "react-router-dom";
 function TrendingItem(props) {
   const { title, mediaType, releaseDate, poster, id } = props;
@@ -8,7 +8,7 @@ function TrendingItem(props) {
     <div className="p-4 flex justify-center items-center flex-col">
       <Link
         to={`/review/${reviewType}/${id}`}
-        className="bg-slate-800 rounded-lg overflow-hidden cursor-pointer shadow-lg shadow-slate-900 hover:bg-yellow-500 hover:text-slate-800 group transition-colors"
+        className="bg-slate-800 rounded-lg overflow-hidden cursor-pointer shadow-lg shadow-slate-900 hover:bg-indigo-600 group transition-colors"
       >
         <div className="rounded-lg overflow-hidden mx-2 mt-2 h-96">
           <img

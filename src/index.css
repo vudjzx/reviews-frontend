@@ -10,7 +10,7 @@ html {
   display: none;
 }
 .loader {
-  border-top-color: #eab308;
+  border-top-color: #4f46e5;
   -webkit-animation: spinner 1.5s linear infinite;
   animation: spinner 1.5s linear infinite;
 }
@@ -34,6 +34,7 @@ html {
 @layer base {
   body {
     @apply bg-slate-800 text-white tracking-wide;
+    font-family: "Poppins", sans-serif;
   }
   h1,
   h2,
@@ -57,5 +58,24 @@ html {
   li {
     @apply cursor-pointer;
     @apply text-slate-50;
+  }
+}
+
+@layer components {
+  .sidebar-icon {
+    @apply relative flex items-center justify-center 
+    h-12 w-12 mt-2 mb-2 mx-auto  
+  bg-gray-400 hover:bg-indigo-600 dark:bg-gray-800 
+  text-slate-500 hover:text-white
+    hover:rounded-xl rounded-3xl
+    transition-all duration-300 ease-linear
+    cursor-pointer shadow-lg;
+  }
+
+  .sidebar-tooltip {
+    @apply absolute w-auto p-2 m-2 min-w-max left-14 rounded-md shadow-md
+    text-white bg-gray-900 
+    text-base font-bold 
+    transition-all duration-100 scale-0 origin-left;
   }
 }

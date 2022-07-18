@@ -4,7 +4,7 @@ import LoadingComponent from "../components/LoadingComponent";
 import PaginationComponent from "../components/PaginationComponent";
 import useGenres from "../hooks/useGenres";
 import useMovies from "../hooks/useMovies";
-import TrendingItem from "../components/TrendingItem";
+import TrendingItem from "../components/media/TrendingItem";
 
 function TvShows() {
   const { getMovies } = useMovies();
@@ -63,6 +63,7 @@ function TvShows() {
 
   return (
     <div className="pt-24">
+      <h2 className="px-4 pb-4">Browse Tv Shows</h2>
       <Genres
         type="tv"
         selectedGenres={selectedGenres}
@@ -76,7 +77,7 @@ function TvShows() {
           <h1 className="text-white text-4xl">No Tv Shows found</h1>
         </div>
       )}
-      <div className="w-full h-[90%] grid grid-cols-1 xl:grid-cols-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 font-light ">
+      <div className="w-full h-[90%] grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 font-light ">
         {movies.map((movie, index) => (
           <TrendingItem
             title={movie.name}
